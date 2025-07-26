@@ -3,178 +3,428 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>来试试点击我呀</title>
+    <title>随机今晚吃什么小炒</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3B82F6',
-                        secondary: '#EC4899',
-                        accent: '#8B5CF6',
+                        primary: '#FF5722',
+                        secondary: '#3949AB',
+                        accent: '#FFC107',
+                        dark: '#1A202C',
+                        light: '#FAFAFA'
                     },
                     fontFamily: {
-                        fun: ['"Comic Sans MS"', '"Marker Felt"', 'sans-serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Montserrat', 'sans-serif']
                     },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-subtle': 'bounce-subtle 2s infinite',
+                        'spin-slow': 'spin 8s linear infinite',
+                    },
+                    keyframes: {
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        'bounce-subtle': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        }
+                    }
                 }
             }
         }
     </script>
     <style type="text/tailwindcss">
         @layer utilities {
-            .btn-bounce {
-                animation: bounce 1s infinite;
+            .content-auto {
+                content-visibility: auto;
             }
             .text-shadow {
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             }
-            .float {
-                animation: float 3s ease-in-out infinite;
+            .text-shadow-lg {
+                text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             }
-        }
-
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
+            .bg-glass {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
             }
-            50% {
-                transform: translateY(-10px);
+            .bg-glass-dark {
+                background: rgba(26, 32, 44, 0.8);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
             }
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
+            .card-hover {
+                transition: all 0.3s ease;
             }
-            50% {
-                transform: translateY(-20px);
+            .card-hover:hover {
+                transform: translateY(-5px);
+            }
+            .particle {
+                position: absolute;
+                border-radius: 50%;
+                pointer-events: none;
+                opacity: 0.6;
             }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col items-center justify-center p-4">
-    <div class="text-center mb-10">
-        <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-fun font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent text-shadow mb-4 float">
-            来玩个游戏吧！
-        </h1>
-        <p class="text-gray-600 text-[clamp(1rem,2vw,1.25rem)] max-w-md mx-auto">
-            看到下面那个按钮了吗？试试看能不能点到它😜
-        </p>
-    </div>
+<body class="min-h-screen font-sans text-dark overflow-x-hidden relative">
+    <!-- 粒子背景容器 -->
+    <div id="particle-container" class="fixed inset-0 z-0"></div>
+    
+    <!-- 主容器 -->
+    <div class="container mx-auto px-4 py-8 max-w-3xl relative z-10">
+        <!-- 页面标题 -->
+        <header class="text-center mb-10 mt-6 animate-float">
+            <h1 class="text-[clamp(2.5rem,8vw,4rem)] font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary mb-4 text-shadow-lg">
+                今晚吃什么？
+            </h1>
+            <p class="text-gray-600 text-lg md:text-xl max-w-xl mx-auto bg-glass px-6 py-3 rounded-full shadow-md">
+                选择困难症？让我们为你随机推荐一道美味小炒！
+            </p>
+        </header>
 
-    <div id="button-container" class="relative w-full max-w-md h-64 flex items-center justify-center">
-        <button 
-            id="trick-button" 
-            class="bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary text-white font-fun font-bold py-4 px-8 rounded-full shadow-lg transform transition-all duration-300 text-[clamp(1rem,3vw,1.5rem)] btn-bounce focus:outline-none focus:ring-4 focus:ring-primary/50"
-        >
-            <i class="fa fa-hand-pointer-o mr-2"></i>点击我！
-        </button>
-    </div>
-
-    <div id="success-message" class="mt-10 hidden">
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-lg transform transition-all duration-500 scale-0">
-            <h2 class="text-xl font-bold font-fun">哇！你做到了！</h2>
-            <p class="mt-2">恭喜你成功点击到了按钮！你真是太厉害了！</p>
-            <button id="reset-button" class="mt-4 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-full transition-colors">
-                再来一次
+        <!-- 主要内容区 -->
+        <main class="bg-glass rounded-2xl shadow-2xl p-6 md:p-10 w-full mb-10 border border-white/20 card-hover">
+            <!-- 结果显示区 -->
+            <div id="result-area" class="mb-10 w-full h-64 md:h-72 flex items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-white/50 transition-all duration-500 relative overflow-hidden">
+                <!-- 装饰元素 -->
+                <div class="absolute -top-10 -left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-secondary/10 rounded-full blur-3xl"></div>
+                
+                <p id="result-text" class="text-gray-500 text-2xl md:text-3xl text-center px-6 font-medium relative z-10">
+                    点击下方按钮开始随机选择
+                </p>
+            </div>
+            
+            <!-- 随机按钮 -->
+            <button 
+                id="random-btn" 
+                class="group bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-bold py-5 px-12 rounded-full text-xl md:text-2xl shadow-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-primary/30 flex items-center justify-center mx-auto relative overflow-hidden"
+            >
+                <span class="relative z-10 flex items-center">
+                    <i class="fa fa-random mr-3 group-hover:rotate-12 transition-transform"></i>
+                    随机选择
+                </span>
+                <span class="absolute inset-0 bg-white/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>
             </button>
+            
+            <!-- 历史记录和统计 -->
+            <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 历史记录 -->
+                <div class="bg-white/70 rounded-xl p-5 shadow-md">
+                    <h3 class="text-lg font-semibold mb-3 flex items-center text-secondary">
+                        <i class="fa fa-history mr-2"></i>历史选择
+                    </h3>
+                    <div id="history-list" class="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-white/50 rounded-lg">
+                        <!-- 历史记录将通过JS动态添加 -->
+                    </div>
+                </div>
+                
+                <!-- 统计图表 -->
+                <div class="bg-white/70 rounded-xl p-5 shadow-md">
+                    <h3 class="text-lg font-semibold mb-3 flex items-center text-primary">
+                        <i class="fa fa-pie-chart mr-2"></i>选择统计
+                    </h3>
+                    <div class="h-32">
+                        <canvas id="selection-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- 推荐理由卡片 -->
+        <div id="reason-card" class="bg-glass-dark text-white rounded-xl shadow-xl p-6 mb-10 transform transition-all duration-500 scale-0 opacity-0">
+            <h3 class="text-xl font-bold mb-3 flex items-center">
+                <i class="fa fa-lightbulb-o text-accent mr-2"></i>推荐理由
+            </h3>
+            <p id="dish-reason" class="text-gray-200">
+                这道菜色香味俱全，营养丰富，制作简单，非常适合今晚的晚餐！
+            </p>
         </div>
+        
+        <!-- 页脚 -->
+        <footer class="text-center text-gray-600 text-sm bg-glass p-4 rounded-lg shadow-md">
+            <p>美味小炒随机选择器 &copy; 2023 | 解决你的选择困难症</p>
+        </footer>
     </div>
 
     <script>
-        const button = document.getElementById('trick-button');
-        const container = document.getElementById('button-container');
-        const successMessage = document.getElementById('success-message');
-        const resetButton = document.getElementById('reset-button');
+        // 常见小炒列表
+        const stirFryDishes = [
+            // 肉类小炒
+            {name: "鱼香肉丝", reason: "酸甜可口，下饭神器，是经典川菜中的代表之一"},
+            {name: "宫保鸡丁", reason: "鸡肉鲜嫩，花生酥脆，麻辣鲜香，口感丰富"},
+            {name: "青椒肉丝", reason: "青椒爽脆，肉丝鲜嫩，简单家常却美味无穷"},
+            {name: "回锅肉", reason: "肥而不腻，香气四溢，是四川民间的传统菜肴"},
+            {name: "麻婆豆腐", reason: "麻辣鲜香，豆腐嫩滑，拌饭绝佳选择"},
+            {name: "水煮肉片", reason: "麻辣过瘾，肉质滑嫩，汤汁浓郁适合下饭"},
+            {name: "红烧肉", reason: "肥而不腻，入口即化，色泽红亮，香气扑鼻"},
+            {name: "糖醋里脊", reason: "外酥里嫩，酸甜适中，大人小孩都爱吃"},
+            {name: "京酱肉丝", reason: "酱香浓郁，肉丝细嫩，搭配薄饼风味独特"},
+            {name: "木须肉", reason: "荤素搭配，营养均衡，口感丰富多样"},
+            {name: "小炒黄牛肉", reason: "牛肉鲜嫩，香辣开胃，非常下饭"},
+            {name: "蒜苔炒肉", reason: "蒜苔脆嫩，肉丝鲜香，季节性美味"},
+            {name: "豆角炒肉", reason: "豆角鲜嫩，肉质香嫩，家常必备菜品"},
+            {name: "番茄炒蛋", reason: "国民菜肴，酸甜可口，营养丰富且制作简单"},
+            {name: "辣椒炒肉", reason: "辣椒的香辣与肉的鲜美完美结合，超级下饭"},
+            
+            // 素菜小炒
+            {name: "清炒时蔬", reason: "清淡爽口，保留蔬菜原味，健康又美味"},
+            {name: "蒜蓉西兰花", reason: "蒜香浓郁，西兰花脆嫩，营养健康"},
+            {name: "凉拌黄瓜", reason: "清爽解腻，开胃小菜，夏日必备"},
+            {name: "酸辣土豆丝", reason: "酸辣开胃，口感脆爽，简单易做"},
+            {name: "地三鲜", reason: "三种蔬菜搭配，鲜香味美，营养丰富"},
+            {name: "干煸豆角", reason: "外焦里嫩，咸香微辣，下饭神器"},
+            {name: "手撕包菜", reason: "口感脆嫩，酱香浓郁，简单又美味"},
+            {name: "红烧茄子", reason: "绵软入味，酱香浓郁，非常下饭"},
+            {name: "虎皮青椒", reason: "香辣过瘾，口感独特，家常美味"},
+            
+            // 特色小炒
+            {name: "小炒腊肉", reason: "腊肉香而不腻，搭配青椒更加爽口开胃"},
+            {name: "剁椒鱼头", reason: "鲜辣可口，鱼肉嫩滑，汤汁可拌面条"},
+            {name: "小炒豆干", reason: "豆干香韧，咸香适口，素食者的好选择"},
+            {name: "干锅土豆片", reason: "土豆外焦里嫩，香辣入味，越吃越香"},
+            {name: "铁板豆腐", reason: "豆腐嫩滑，酱汁浓郁，铁板保温风味更佳"},
+            {name: "小炒荷兰豆", reason: "荷兰豆脆嫩，搭配木耳虾仁更显鲜美"}
+        ];
+
+        // DOM元素
+        const randomButton = document.getElementById('random-btn');
+        const resultText = document.getElementById('result-text');
+        const resultArea = document.getElementById('result-area');
+        const historyListElement = document.getElementById('history-list');
+        const reasonCard = document.getElementById('reason-card');
+        const dishReason = document.getElementById('dish-reason');
+        const particleContainer = document.getElementById('particle-container');
         
-        // 按钮初始位置
-        let buttonX = 0;
-        let buttonY = 0;
+        // 图表初始化
+        let selectionChart;
+        let selectionCounts = {};
         
-        // 移动按钮的函数
-        function moveButton(e) {
-            // 获取容器的位置和尺寸
-            const containerRect = container.getBoundingClientRect();
-            const containerWidth = containerRect.width;
-            const containerHeight = containerRect.height;
+        // 应用状态
+        let history = [];
+        let animationFrameId;
+
+        // 初始化
+        function init() {
+            setupEventListeners();
+            createParticles();
+            initChart();
+        }
+
+        // 创建粒子背景
+        function createParticles() {
+            const particleCount = 30;
+            const colors = ['#FF5722', '#FFC107', '#3949AB', '#4CAF50', '#E91E63'];
             
-            // 获取按钮的尺寸
-            const buttonWidth = button.offsetWidth;
-            const buttonHeight = button.offsetHeight;
-            
-            // 计算最大可移动距离（确保按钮不会移出容器）
-            const maxX = containerWidth - buttonWidth;
-            const maxY = containerHeight - buttonHeight;
-            
-            // 随机生成新位置
-            const newX = Math.floor(Math.random() * maxX);
-            const newY = Math.floor(Math.random() * maxY);
-            
-            // 应用新位置
-            button.style.position = 'absolute';
-            button.style.left = `${newX}px`;
-            button.style.top = `${newY}px`;
-            
-            // 记录当前位置
-            buttonX = newX;
-            buttonY = newY;
-            
-            // 随机改变按钮文本
-            const texts = [
-                "抓到我呀～",
-                "嘿嘿，没中！",
-                "再试一次？",
-                "你太慢啦！",
-                "差一点哦！",
-                "点击我！"
-            ];
-            const randomText = texts[Math.floor(Math.random() * texts.length)];
-            button.innerHTML = `<i class="fa fa-hand-pointer-o mr-2"></i>${randomText}`;
-            
-            // 5%的概率让用户成功点击（增加趣味性）
-            if (Math.random() < 0.05) {
-                button.removeEventListener('mouseover', moveButton);
-                button.addEventListener('click', showSuccess);
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // 随机属性
+                const size = Math.random() * 15 + 5;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const duration = Math.random() * 30 + 20;
+                const delay = Math.random() * 10;
+                
+                // 应用样式
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = color;
+                particle.style.left = `${left}%`;
+                particle.style.top = `${top}%`;
+                particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+                
+                particleContainer.appendChild(particle);
             }
         }
-        
-        // 显示成功信息
-        function showSuccess() {
-            button.style.display = 'none';
-            successMessage.classList.remove('hidden');
+
+        // 初始化图表
+        function initChart() {
+            const ctx = document.getElementById('selection-chart').getContext('2d');
+            
+            selectionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#FF5722', '#FF9800', '#FFC107', '#8BC34A', 
+                            '#4CAF50', '#2196F3', '#3949AB', '#9C27B0'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}次`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // 更新图表
+        function updateChart(selectedDish) {
+            // 更新计数
+            if (selectionCounts[selectedDish]) {
+                selectionCounts[selectedDish]++;
+            } else {
+                selectionCounts[selectedDish] = 1;
+            }
+            
+            // 只显示前5种最常被选中的
+            const sortedEntries = Object.entries(selectionCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+            
+            // 更新图表数据
+            selectionChart.data.labels = sortedEntries.map(entry => entry[0]);
+            selectionChart.data.datasets[0].data = sortedEntries.map(entry => entry[1]);
+            selectionChart.update();
+        }
+
+        // 随机选择食物
+        function randomSelect() {
+            // 隐藏推荐理由卡片
+            reasonCard.classList.remove('scale-100', 'opacity-100');
+            reasonCard.classList.add('scale-0', 'opacity-0');
+            
             // 添加动画效果
-            setTimeout(() => {
-                successMessage.querySelector('div').classList.remove('scale-0');
-                successMessage.querySelector('div').classList.add('scale-100');
-            }, 100);
+            randomButton.disabled = true;
+            randomButton.innerHTML = `
+                <span class="relative z-10 flex items-center">
+                    <i class="fa fa-circle-o-notch fa-spin mr-3"></i>
+                    选择中...
+                </span>
+                <span class="absolute inset-0 bg-white/10 transform scale-x-0"></span>
+            `;
+            resultArea.classList.remove('border-green-500', 'bg-green-50', 'border-red-300');
+            resultArea.classList.add('border-yellow-400', 'bg-yellow-50/50');
+            
+            // 创建选择动画
+            let iterations = 0;
+            const maxIterations = 20;
+            const interval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * stirFryDishes.length);
+                resultText.textContent = stirFryDishes[randomIndex].name;
+                
+                // 添加文字抖动效果
+                resultText.classList.add('animate-pulse-slow');
+                setTimeout(() => {
+                    resultText.classList.remove('animate-pulse-slow');
+                }, 80);
+                
+                iterations++;
+                if (iterations >= maxIterations) {
+                    clearInterval(interval);
+                    
+                    // 最终选择
+                    const finalIndex = Math.floor(Math.random() * stirFryDishes.length);
+                    const selectedDish = stirFryDishes[finalIndex];
+                    resultText.textContent = selectedDish.name;
+                    
+                    // 添加结果样式和动画
+                    resultArea.classList.remove('border-yellow-400', 'bg-yellow-50/50');
+                    resultArea.classList.add('border-green-500', 'bg-green-50/50');
+                    resultText.classList.add('bounce-in');
+                    
+                    // 恢复按钮状态
+                    setTimeout(() => {
+                        randomButton.disabled = false;
+                        randomButton.innerHTML = `
+                            <span class="relative z-10 flex items-center">
+                                <i class="fa fa-random mr-3 group-hover:rotate-12 transition-transform"></i>
+                                随机选择
+                            </span>
+                            <span class="absolute inset-0 bg-white/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>
+                        `;
+                        resultText.classList.remove('bounce-in');
+                        
+                        // 显示推荐理由
+                        setTimeout(() => {
+                            dishReason.textContent = selectedDish.reason;
+                            reasonCard.classList.remove('scale-0', 'opacity-0');
+                            reasonCard.classList.add('scale-100', 'opacity-100');
+                        }, 500);
+                    }, 600);
+                    
+                    // 添加到历史记录和更新图表
+                    addToHistory(selectedDish.name);
+                    updateChart(selectedDish.name);
+                }
+            }, 80);
         }
-        
-        // 重置游戏
-        function resetGame() {
-            successMessage.querySelector('div').classList.remove('scale-100');
-            successMessage.querySelector('div').classList.add('scale-0');
-            setTimeout(() => {
-                successMessage.classList.add('hidden');
-                button.style.display = 'block';
-                button.style.left = '50%';
-                button.style.top = '50%';
-                button.style.transform = 'translate(-50%, -50%)';
-                button.innerHTML = '<i class="fa fa-hand-pointer-o mr-2"></i>点击我！';
-                button.addEventListener('mouseover', moveButton);
-                button.removeEventListener('click', showSuccess);
-            }, 500);
+
+        // 添加到历史记录
+        function addToHistory(dishName) {
+            // 限制历史记录数量
+            if (history.length >= 8) {
+                history.shift();
+            }
+            
+            history.push(dishName);
+            renderHistory();
         }
-        
-        // 添加事件监听器
-        button.addEventListener('mouseover', moveButton);
-        button.addEventListener('click', () => {
-            // 正常情况下点击不会成功，除非触发了5%的概率
-            button.innerHTML = '<i class="fa fa-times mr-2"></i>没抓到！';
-            setTimeout(moveButton, 100);
-        });
-        resetButton.addEventListener('click', resetGame);
+
+        // 渲染历史记录
+        function renderHistory() {
+            historyListElement.innerHTML = '';
+            
+            history.forEach((dish, index) => {
+                const span = document.createElement('span');
+                span.className = 'px-3 py-1.5 bg-white rounded-full text-sm flex items-center shadow-sm hover:shadow transition-shadow';
+                span.innerHTML = `
+                    <span class="text-xs w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center mr-2">${history.length - index}</span>
+                    ${dish}
+                `;
+                historyListElement.appendChild(span);
+            });
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 随机选择按钮
+            randomButton.addEventListener('click', randomSelect);
+            
+            // 窗口大小变化时重绘图表
+            window.addEventListener('resize', () => {
+                if (selectionChart) {
+                    selectionChart.resize();
+                }
+            });
+        }
+
+        // 启动应用
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
+    
